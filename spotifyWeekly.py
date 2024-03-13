@@ -11,7 +11,7 @@ app = Flask(__name__)
 app.config['SESSION_COOKIE_NAME'] = 'Spotify Cookie'
 
 # set a random secret key to sign the cookie
-app.secret_key = 'YOUR_SECRET_KEY'
+app.secret_key = 'eveeveeve1012**'
 
 # set the key for the token info in the session dictionary
 TOKEN_INFO = 'token_info'
@@ -35,12 +35,12 @@ def redirect_page():
     token_info = create_spotify_oauth().get_access_token(code)
     # save the token info in the session
     session[TOKEN_INFO] = token_info
-    # redirect the user to the save_discover_weekly route
-    return redirect(url_for('save_discover_weekly',_external=True))
+    # redirect the user to the find_followed_artists route
+    return redirect(url_for('find_followed_artists',_external=True))
 
 # route to save the Discover Weekly songs to a playlist
-@app.route('/saveDiscoverWeekly')
-def save_discover_weekly():
+@app.route('/findFollowedArtists')
+def find_followed_artists():
     try: 
         # get the token info from the session
         token_info = get_token()
@@ -48,7 +48,13 @@ def save_discover_weekly():
         # if the token info is not found, redirect the user to the login route
         print('User not logged in')
         return redirect("/")
-    return ("OAUTH SUCCESSFUL!")
+
+    # create a Spotipy instance with the access token
+    sp = spotipy.Spotify(auth=token_info['access_token'])
+
+    # get the user's playlists
+    current_artists =  sp.current_user_followed_artists()
+    return current_artists
 
 # function to get the token info from the session
 def get_token():
@@ -72,7 +78,7 @@ def create_spotify_oauth():
         client_id = '6d7fa384314349179650ac1b0194f148',
         client_secret = '2b8113b7eaf34d8ea2fb31e7564ce413',
         redirect_uri = url_for('redirect_page', _external=True),
-        scope='user-library-read playlist-modify-public playlist-modify-private'
+        scope='user-follow-read'
     )
 
 app.run(debug=True)
