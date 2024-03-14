@@ -3,9 +3,11 @@ import time
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from flask import Flask, request, url_for, session, redirect
+from flask_cors import CORS 
 
 # initialize Flask app
 app = Flask(__name__)
+CORS(app)
 
 # set the name of the session cookie
 app.config['SESSION_COOKIE_NAME'] = 'Spotify Cookie'
@@ -37,6 +39,10 @@ def redirect_page():
     session[TOKEN_INFO] = token_info
     # redirect the user to the find_followed_artists route
     return redirect(url_for('find_followed_artists',_external=True))
+
+@app.route('/find')
+def members():
+    return {"members":["eve","Member2","Memver3"]}
 
 # route to save the Discover Weekly songs to a playlist
 @app.route('/findFollowedArtists')
